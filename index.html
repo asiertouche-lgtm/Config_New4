@@ -757,6 +757,394 @@ body.memento-black-pure{
 }
 </style>
 
+
+<style id="memento-compact-ui-fix">
+/* === COMPACT PREMIUM UI FIX === */
+
+/* Loading: logo MEMENTO visibile */
+body:not(.memento-ui-ready)::before{
+  content:"";
+  position:fixed;
+  left:50%;
+  top:50%;
+  width:min(340px,62vw);
+  height:160px;
+  transform:translate(-50%,-50%);
+  background:url("assets/logo/memento-logo.webp") center/contain no-repeat;
+  z-index:999999;
+  opacity:.96;
+  filter:drop-shadow(0 0 34px rgba(255,121,80,.32)) drop-shadow(0 0 80px rgba(255,255,255,.10));
+  pointer-events:none;
+}
+body:not(.memento-ui-ready)::after{
+  content:"LOADING CONFIGURATOR";
+  position:fixed;
+  left:50%;
+  top:calc(50% + 95px);
+  transform:translateX(-50%);
+  z-index:999999;
+  color:rgba(255,255,255,.62);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.34em;
+  font-family:Inter,Arial,sans-serif;
+  pointer-events:none;
+}
+
+/* Box menu più compatto e bilanciato */
+.panel,
+.sidebar,
+.controls,
+.control-panel{
+  bottom:20px!important;
+  width:min(1040px,calc(100vw - 56px))!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:25svh!important;
+  padding:12px 18px 14px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:10px!important;
+  overflow:hidden!important;
+}
+
+/* Toolbar integrata e compatta */
+.toolbar,
+.tools,
+#memento-integrated-toolbar{
+  position:static!important;
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:8px!important;
+  margin:0!important;
+  padding:0!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+
+.toolbar button,
+.tools button,
+.tool,
+#memento-integrated-toolbar button{
+  height:36px!important;
+  min-height:36px!important;
+  max-height:36px!important;
+  padding:0 10px!important;
+  font-size:9px!important;
+  letter-spacing:.12em!important;
+  border-radius:11px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+
+/* Contenuto centrale compatto */
+#memento-controls-wrap{
+  display:grid!important;
+  grid-template-columns:160px minmax(260px,1.3fr) minmax(190px,.8fr) minmax(190px,.8fr)!important;
+  gap:0!important;
+  width:100%!important;
+  max-height:118px!important;
+  overflow:hidden!important;
+  align-items:start!important;
+}
+
+/* Sezioni più basse e con meno spazio vuoto */
+.panel .section,
+.sidebar .section,
+.controls .section,
+.control-panel .section,
+#memento-controls-wrap > *{
+  padding:0 16px!important;
+  min-width:0!important;
+  max-width:none!important;
+  overflow:hidden!important;
+  border-right:1px solid rgba(255,255,255,.065)!important;
+}
+
+.panel .section:first-child,
+.sidebar .section:first-child,
+.controls .section:first-child,
+.control-panel .section:first-child,
+#memento-controls-wrap > *:first-child{
+  padding-left:0!important;
+}
+.panel .section:last-child,
+.sidebar .section:last-child,
+.controls .section:last-child,
+.control-panel .section:last-child,
+#memento-controls-wrap > *:last-child{
+  padding-right:0!important;
+  border-right:0!important;
+}
+
+/* Titoli più compatti */
+h1,h2,h3,label,.label,.section-title{
+  font-size:8.5px!important;
+  letter-spacing:.18em!important;
+  margin:0 0 8px 0!important;
+}
+
+/* Select e buttons più compatti */
+select,
+.panel button:not(.tool),
+.sidebar button:not(.tool),
+.controls button:not(.tool),
+.control-panel button:not(.tool){
+  min-height:34px!important;
+  height:34px!important;
+  padding:0 10px!important;
+  font-size:8.5px!important;
+  letter-spacing:.08em!important;
+  border-radius:10px!important;
+}
+
+/* COLORI: sempre visibili, colorati e scorribili */
+.swatches,
+.colors,
+.color-list,
+.texture-list,
+.options,
+.row{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  gap:7px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  max-width:100%!important;
+  padding:2px 2px 7px 2px!important;
+  scroll-snap-type:x proximity!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+
+.swatches::-webkit-scrollbar,
+.colors::-webkit-scrollbar,
+.color-list::-webkit-scrollbar,
+.texture-list::-webkit-scrollbar,
+.options::-webkit-scrollbar,
+.row::-webkit-scrollbar{
+  height:4px!important;
+}
+.swatches::-webkit-scrollbar-thumb,
+.colors::-webkit-scrollbar-thumb,
+.color-list::-webkit-scrollbar-thumb,
+.texture-list::-webkit-scrollbar-thumb,
+.options::-webkit-scrollbar-thumb,
+.row::-webkit-scrollbar-thumb{
+  background:rgba(255,121,80,.45)!important;
+  border-radius:999px!important;
+}
+
+/* Pulsanti colore riconoscibili */
+.swatch,
+.color-btn,
+.texture-btn,
+.light-swatch{
+  width:30px!important;
+  height:30px!important;
+  min-width:30px!important;
+  max-width:30px!important;
+  border-radius:50%!important;
+  border:1px solid rgba(255,255,255,.22)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22),
+    0 0 0 1px rgba(0,0,0,.45)!important;
+  background-size:cover!important;
+  background-position:center!important;
+  scroll-snap-align:start!important;
+  position:relative!important;
+}
+
+/* Fallback colori se i bottoni non hanno background */
+.swatch:nth-child(1),.color-btn:nth-child(1),.texture-btn:nth-child(1){background:#050505!important}
+.swatch:nth-child(2),.color-btn:nth-child(2),.texture-btn:nth-child(2){background:#2d2d2d!important}
+.swatch:nth-child(3),.color-btn:nth-child(3),.texture-btn:nth-child(3){background:#767676!important}
+.swatch:nth-child(4),.color-btn:nth-child(4),.texture-btn:nth-child(4){background:#d8d8d8!important}
+.swatch:nth-child(5),.color-btn:nth-child(5),.texture-btn:nth-child(5){background:#2e4156!important}
+.swatch:nth-child(6),.color-btn:nth-child(6),.texture-btn:nth-child(6){background:#4b3527!important}
+.swatch:nth-child(7),.color-btn:nth-child(7),.texture-btn:nth-child(7){background:#6d1414!important}
+.swatch:nth-child(8),.color-btn:nth-child(8),.texture-btn:nth-child(8){background:#FF7950!important}
+
+.swatch.active,
+.color-btn.active,
+.texture-btn.active,
+.selected,
+.active{
+  border-color:#FF7950!important;
+  box-shadow:
+    0 0 0 2px rgba(255,121,80,.36),
+    0 0 18px rgba(255,121,80,.34)!important;
+}
+
+/* Reset non deve sovrapporsi: rimane dentro la griglia toolbar */
+button[data-action*="reset" i],
+button[aria-label*="reset" i],
+.reset,
+#reset{
+  position:relative!important;
+  inset:auto!important;
+  transform:none!important;
+}
+
+/* Modello non tagliato */
+canvas{
+  overflow:visible!important;
+  clip-path:none!important;
+}
+
+/* Tablet */
+@media(max-width:980px){
+  .panel,
+  .sidebar,
+  .controls,
+  .control-panel{
+    width:calc(100vw - 28px)!important;
+    max-height:30svh!important;
+    padding:10px 14px 12px!important;
+  }
+
+  #memento-controls-wrap{
+    grid-template-columns:140px minmax(220px,1.2fr) minmax(170px,.8fr) minmax(170px,.8fr)!important;
+    max-height:112px!important;
+  }
+
+  .toolbar button,
+  .tools button,
+  .tool,
+  #memento-integrated-toolbar button{
+    height:34px!important;
+    min-height:34px!important;
+    font-size:8px!important;
+  }
+}
+
+/* Mobile: non si allarga, tutto resta dentro */
+@media(max-width:720px){
+  body:not(.memento-ui-ready)::before{
+    width:min(260px,70vw);
+  }
+
+  .panel,
+  .sidebar,
+  .controls,
+  .control-panel{
+    left:50%!important;
+    width:calc(100vw - 16px)!important;
+    max-width:calc(100vw - 16px)!important;
+    bottom:8px!important;
+    padding:9px!important;
+    max-height:38svh!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    border-radius:16px!important;
+  }
+
+  .toolbar,
+  .tools,
+  #memento-integrated-toolbar{
+    grid-template-columns:repeat(4,1fr)!important;
+    gap:5px!important;
+  }
+
+  .toolbar button,
+  .tools button,
+  .tool,
+  #memento-integrated-toolbar button{
+    height:32px!important;
+    min-height:32px!important;
+    font-size:6.8px!important;
+    letter-spacing:.02em!important;
+    padding:0 2px!important;
+    border-radius:9px!important;
+  }
+
+  #memento-controls-wrap{
+    grid-template-columns:1fr 1fr!important;
+    grid-template-rows:auto auto!important;
+    gap:10px 0!important;
+    width:100%!important;
+    max-width:100%!important;
+    max-height:170px!important;
+    overflow:hidden!important;
+  }
+
+  .panel .section,
+  .sidebar .section,
+  .controls .section,
+  .control-panel .section,
+  #memento-controls-wrap > *{
+    width:100%!important;
+    min-width:0!important;
+    padding:0 9px!important;
+    overflow:hidden!important;
+  }
+
+  #memento-controls-wrap > *:nth-child(2n),
+  .panel .section:nth-child(2n),
+  .sidebar .section:nth-child(2n),
+  .controls .section:nth-child(2n),
+  .control-panel .section:nth-child(2n){
+    border-right:0!important;
+  }
+
+  h1,h2,h3,label,.label,.section-title{
+    font-size:7px!important;
+    letter-spacing:.12em!important;
+    margin-bottom:6px!important;
+  }
+
+  select,
+  .panel button:not(.tool),
+  .sidebar button:not(.tool),
+  .controls button:not(.tool),
+  .control-panel button:not(.tool){
+    min-height:30px!important;
+    height:30px!important;
+    font-size:7px!important;
+    padding:0 7px!important;
+  }
+
+  .swatch,
+  .color-btn,
+  .texture-btn,
+  .light-swatch{
+    width:24px!important;
+    height:24px!important;
+    min-width:24px!important;
+    max-width:24px!important;
+  }
+}
+
+/* Small mobile */
+@media(max-width:420px){
+  .panel,
+  .sidebar,
+  .controls,
+  .control-panel{
+    max-height:40svh!important;
+  }
+
+  #memento-controls-wrap{
+    max-height:178px!important;
+  }
+
+  .toolbar button,
+  .tools button,
+  .tool,
+  #memento-integrated-toolbar button{
+    font-size:6.3px!important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -1411,6 +1799,91 @@ start();
     document.body.classList.add('memento-ui-ready');
     ready();
   },1800);
+})();
+</script>
+
+
+<script id="memento-compact-ui-fix-js">
+(function(){
+  function isToolbarButton(el){
+    var t=(el.textContent||'').trim().toLowerCase();
+    return ['reset','wireframe','auto','auto off','snap','export','export png','screenshot'].includes(t);
+  }
+
+  function fixToolbar(){
+    var panel=document.querySelector('.panel,.sidebar,.controls,.control-panel');
+    if(!panel) return;
+
+    var toolbar=document.querySelector('#memento-integrated-toolbar') || document.querySelector('.toolbar,.tools');
+    if(!toolbar){
+      toolbar=document.createElement('div');
+      toolbar.id='memento-integrated-toolbar';
+    }
+
+    toolbar.innerHTML='';
+    ['RESET','WIREFRAME','AUTO OFF','SNAP'].forEach(function(label){
+      var existing=Array.from(document.querySelectorAll('button,.tool')).find(function(b){
+        var t=(b.textContent||'').trim().toLowerCase();
+        if(label==='SNAP') return ['snap','export','export png','screenshot'].includes(t);
+        if(label==='AUTO OFF') return ['auto','auto off'].includes(t);
+        return t===label.toLowerCase();
+      });
+
+      var btn=existing || document.createElement('button');
+      btn.textContent=label;
+      btn.classList.add('tool');
+      toolbar.appendChild(btn);
+    });
+
+    panel.prepend(toolbar);
+  }
+
+  function wrapControls(){
+    var panel=document.querySelector('.panel,.sidebar,.controls,.control-panel');
+    if(!panel) return;
+
+    var toolbar=document.querySelector('#memento-integrated-toolbar,.toolbar,.tools');
+
+    var wrap=document.getElementById('memento-controls-wrap');
+    if(!wrap){
+      wrap=document.createElement('div');
+      wrap.id='memento-controls-wrap';
+      Array.from(panel.children).forEach(function(child){
+        if(child===toolbar) return;
+        wrap.appendChild(child);
+      });
+      panel.appendChild(wrap);
+    }
+  }
+
+  function markReady(){
+    setTimeout(function(){
+      document.body.classList.add('memento-ui-ready');
+    },900);
+  }
+
+  function makeColorButtonsVisible(){
+    document.querySelectorAll('.swatch,.color-btn,.texture-btn,.light-swatch').forEach(function(el,i){
+      var style=getComputedStyle(el);
+      var bg=style.backgroundColor;
+      var hasImage=style.backgroundImage && style.backgroundImage!=='none';
+      if((!bg || bg==='rgba(0, 0, 0, 0)' || bg==='transparent') && !hasImage){
+        var colors=['#050505','#2d2d2d','#767676','#d8d8d8','#2e4156','#4b3527','#6d1414','#FF7950'];
+        el.style.background=colors[i%colors.length];
+      }
+    });
+  }
+
+  function run(){
+    fixToolbar();
+    wrapControls();
+    makeColorButtonsVisible();
+  }
+
+  window.addEventListener('DOMContentLoaded',function(){run();markReady();});
+  window.addEventListener('load',function(){run();markReady();});
+  setTimeout(run,500);
+  setTimeout(run,1200);
 })();
 </script>
 
