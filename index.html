@@ -682,6 +682,55 @@ button[data-texture],button[data-color],button[style*="background"]{
 }
 </style>
 
+
+<style id="memento-texture-visible-fx">
+.texture-btn,.swatch,.color-btn,.light-swatch,button[data-texture],button[data-color],button[data-material]{
+  width:42px!important;height:42px!important;min-width:42px!important;max-width:42px!important;
+  border-radius:12px!important;padding:0!important;overflow:hidden!important;position:relative!important;
+  background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;
+  border:1px solid rgba(255,255,255,.24)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 0 1px rgba(0,0,0,.65)!important;
+  text-indent:-999px!important;
+}
+.texture-btn::after,.swatch::after,.color-btn::after,button[data-texture]::after,button[data-color]::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.14),transparent 38%),radial-gradient(circle at 50% 0%,rgba(255,121,80,.16),transparent 42%);
+  pointer-events:none;
+}
+.swatches,.colors,.color-list,.texture-list,.options,.row{
+  display:flex!important;flex-wrap:nowrap!important;gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important;
+  padding:2px 2px 9px 2px!important;scroll-snap-type:x proximity!important;
+}
+.swatches::-webkit-scrollbar,.colors::-webkit-scrollbar,.color-list::-webkit-scrollbar,.texture-list::-webkit-scrollbar,.options::-webkit-scrollbar,.row::-webkit-scrollbar{height:4px!important}
+.swatches::-webkit-scrollbar-thumb,.colors::-webkit-scrollbar-thumb,.color-list::-webkit-scrollbar-thumb,.texture-list::-webkit-scrollbar-thumb,.options::-webkit-scrollbar-thumb,.row::-webkit-scrollbar-thumb{background:rgba(255,121,80,.48)!important;border-radius:999px!important}
+.texture-btn.active,.swatch.active,.color-btn.active,.selected,.active{
+  border-color:#FF7950!important;box-shadow:0 0 0 2px rgba(255,121,80,.38),0 0 22px rgba(255,121,80,.38)!important;
+}
+.swatch:nth-child(1),.color-btn:nth-child(1),.texture-btn:nth-child(1){background-color:#060606!important}
+.swatch:nth-child(2),.color-btn:nth-child(2),.texture-btn:nth-child(2){background-color:#2c2c2c!important}
+.swatch:nth-child(3),.color-btn:nth-child(3),.texture-btn:nth-child(3){background-color:#777!important}
+.swatch:nth-child(4),.color-btn:nth-child(4),.texture-btn:nth-child(4){background-color:#ddd!important}
+.swatch:nth-child(5),.color-btn:nth-child(5),.texture-btn:nth-child(5){background-color:#2b4058!important}
+.swatch:nth-child(6),.color-btn:nth-child(6),.texture-btn:nth-child(6){background-color:#4b3327!important}
+.swatch:nth-child(7),.color-btn:nth-child(7),.texture-btn:nth-child(7){background-color:#661414!important}
+.swatch:nth-child(8),.color-btn:nth-child(8),.texture-btn:nth-child(8){background-color:#FF7950!important}
+
+#memento-fx-scan{
+  position:fixed;inset:0;z-index:30;pointer-events:none;opacity:0;
+  background:linear-gradient(to top,transparent 0%,transparent var(--scan-y,0%),rgba(255,121,80,0) calc(var(--scan-y,0%) + 1%),rgba(255,121,80,.9) calc(var(--scan-y,0%) + 2%),rgba(255,121,80,.28) calc(var(--scan-y,0%) + 5%),transparent calc(var(--scan-y,0%) + 12%));
+  mix-blend-mode:screen;
+}
+body.memento-fx-active #memento-fx-scan{opacity:1;animation:mementoScan 1.65s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes mementoScan{0%{--scan-y:0%;opacity:0}8%{opacity:1}100%{--scan-y:110%;opacity:0}}
+body.memento-fx-active canvas{animation:mementoModelVanish 1.65s cubic-bezier(.16,1,.3,1) forwards!important}
+@keyframes mementoModelVanish{0%{filter:none;opacity:1}45%{filter:brightness(1.6) drop-shadow(0 0 28px rgba(255,121,80,.55));opacity:.88}100%{filter:brightness(2) blur(8px);opacity:0}}
+body.memento-fx-return canvas{animation:mementoModelReturn .9s cubic-bezier(.16,1,.3,1) forwards!important}
+@keyframes mementoModelReturn{0%{filter:brightness(2) blur(8px);opacity:0}100%{filter:none;opacity:1}}
+@media(max-width:720px){
+  .texture-btn,.swatch,.color-btn,.light-swatch,button[data-texture],button[data-color],button[data-material]{width:32px!important;height:32px!important;min-width:32px!important;max-width:32px!important;border-radius:10px!important}
+}
+</style>
+
 </head>
 
 <body>
@@ -1332,6 +1381,64 @@ start();
   setTimeout(ready,400);
   setTimeout(ready,1200);
   setTimeout(function(){document.body.classList.add('memento-ui-ready'); ready();},1800);
+})();
+</script>
+
+
+<script id="memento-texture-visible-fx-js">
+(function(){
+  const ext=/\.(webp|png|jpg|jpeg)$/i;
+  function collect(o,out){
+    if(typeof o==="string" && ext.test(o) && !o.toLowerCase().includes("logo")) out.push(o);
+    else if(Array.isArray(o)) o.forEach(v=>collect(v,out));
+    else if(o && typeof o==="object") Object.values(o).forEach(v=>collect(v,out));
+  }
+  async function applyPreviews(){
+    try{
+      const cfg=await fetch("configurator.json").then(r=>r.json());
+      let imgs=[]; collect(cfg,imgs); imgs=[...new Set(imgs)];
+      if(!imgs.length) return;
+      const btns=[...document.querySelectorAll(".texture-btn,.swatch,.color-btn,.light-swatch,button")].filter(b=>{
+        const c=(b.className||"").toString().toLowerCase();
+        const t=(b.textContent||"").trim();
+        return c.includes("texture")||c.includes("swatch")||c.includes("color")||(b.tagName==="BUTTON" && t.length<18 && !["reset","wireframe","auto","auto off","snap","fx"].includes(t.toLowerCase()));
+      });
+      btns.forEach((b,i)=>{
+        let explicit=null;
+        [...b.attributes].forEach(a=>{ if(ext.test(a.value)) explicit=a.value; });
+        const src=explicit||imgs[i%imgs.length];
+        b.style.backgroundImage='url("'+src+'")';
+        b.style.backgroundSize="cover";
+        b.style.backgroundPosition="center";
+        b.style.backgroundRepeat="no-repeat";
+        b.setAttribute("data-preview-texture",src);
+      });
+    }catch(e){}
+  }
+  function addFx(){
+    const toolbar=document.querySelector("#memento-toolbar-slot,.toolbar,.tools");
+    if(!toolbar || toolbar.querySelector("[data-memento-fx]")) return;
+    toolbar.style.gridTemplateColumns="repeat(5,minmax(0,1fr))";
+    const btn=document.createElement("button");
+    btn.textContent="FX"; btn.type="button"; btn.className="tool"; btn.setAttribute("data-memento-fx","true");
+    btn.addEventListener("click",runFx);
+    toolbar.appendChild(btn);
+  }
+  function ensureLayer(){
+    if(document.getElementById("memento-fx-scan")) return;
+    const fx=document.createElement("div"); fx.id="memento-fx-scan"; document.body.appendChild(fx);
+  }
+  function runFx(){
+    ensureLayer();
+    document.body.classList.remove("memento-fx-return");
+    document.body.classList.add("memento-fx-active");
+    setTimeout(()=>{document.body.classList.remove("memento-fx-active");document.body.classList.add("memento-fx-return");},1750);
+    setTimeout(()=>document.body.classList.remove("memento-fx-return"),2750);
+  }
+  function run(){applyPreviews();addFx();ensureLayer();}
+  window.addEventListener("DOMContentLoaded",run);
+  window.addEventListener("load",run);
+  setTimeout(run,600); setTimeout(run,1400); setInterval(applyPreviews,2500);
 })();
 </script>
 
