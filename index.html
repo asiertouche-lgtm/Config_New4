@@ -1,0 +1,1418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MEMENTO CONFIGURATOR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020202;color:white;font-family:Inter,Helvetica,Arial,sans-serif}
+#app{position:fixed;inset:0;background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.12),transparent 32%),linear-gradient(90deg,#010101,#111,#010101)}
+canvas{display:block;position:absolute;inset:0;z-index:1}
+.logo-bg{position:absolute;z-index:0;left:50%;top:2%;transform:translateX(-50%);width:min(86vw,1300px);opacity:.72;filter:drop-shadow(0 0 42px rgba(255,255,255,.95)) drop-shadow(0 0 130px rgba(255,255,255,.6));pointer-events:none;transition:filter .35s ease, opacity .35s ease}
+.brand{position:absolute;top:28px;left:34px;z-index:5;width:190px;filter:drop-shadow(0 0 18px rgba(255,255,255,.55))}
+.brand img{display:block;width:100%;height:auto}
+.panel{position:absolute;left:34px;top:150px;width:235px;max-height:calc(100vh - 210px);overflow:auto;z-index:5;background:rgba(18,18,18,.62);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:20px;box-shadow:0 20px 80px rgba(0,0,0,.55)}
+.section{padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.section:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+h3{margin:0 0 12px;font-size:12px;letter-spacing:1.8px;text-transform:uppercase}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+button,select{color:white;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:10px;cursor:pointer}
+.arrow{position:absolute;z-index:20;top:50%;transform:translateY(-50%);width:58px;height:58px;border-radius:50%;font-size:34px;line-height:1;background:rgba(0,0,0,.42);backdrop-filter:blur(12px);box-shadow:0 0 26px rgba(255,255,255,.18);pointer-events:auto}
+.arrow:hover{background:rgba(255,255,255,.14);box-shadow:0 0 34px rgba(255,255,255,.35)}
+.arrow.left{left:290px}
+.arrow.right{right:180px}
+.light-row{display:flex;gap:9px;flex-wrap:wrap}
+.light-swatch{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.35)}
+.model-fade-out{animation:fadeOutModel .28s ease forwards}
+.model-fade-in{animation:fadeInModel .38s ease forwards}
+@keyframes fadeOutModel{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.94)}}
+@keyframes fadeInModel{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:scale(1)}}
+select{width:100%;height:38px;padding:0 10px;text-transform:uppercase;letter-spacing:1px;background:#111;color:#fff;border:1px solid rgba(255,255,255,.28)}
+select option{background:#111;color:#fff;font-size:13px;letter-spacing:0;text-transform:none;padding:10px}
+select:focus{outline:2px solid rgba(255,255,255,.55)}
+.rgb-wrap{display:flex;align-items:center;gap:12px}
+.color-picker{width:44px;height:38px;border:1px solid rgba(255,255,255,.22);border-radius:10px;background:transparent;padding:3px;cursor:pointer}
+.range{width:120px;accent-color:white}
+#app.bg-normal{background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.12),transparent 32%),linear-gradient(90deg,#010101,#111,#010101)}
+#app.bg-negative{background:radial-gradient(circle at 50% 42%,rgba(0,0,0,.18),transparent 34%),linear-gradient(90deg,#f4f4f4,#bcbcbc,#f4f4f4)}
+#app.bg-hdri1{background:
+ radial-gradient(circle at 50% 15%,rgba(255,255,255,.28),transparent 20%),
+ radial-gradient(circle at 15% 50%,rgba(255,255,255,.12),transparent 24%),
+ radial-gradient(circle at 85% 55%,rgba(255,255,255,.10),transparent 24%),
+ linear-gradient(135deg,#030303,#161616 42%,#050505)}
+#app.bg-hdri2{background:
+ radial-gradient(circle at 52% 22%,rgba(150,205,255,.36),transparent 24%),
+ radial-gradient(circle at 16% 60%,rgba(0,120,255,.22),transparent 28%),
+ radial-gradient(circle at 88% 60%,rgba(60,120,255,.18),transparent 26%),
+ linear-gradient(135deg,#00030a,#071221 44%,#000)}
+#app.bg-hdri3{background:
+ radial-gradient(circle at 50% 18%,rgba(255,210,150,.33),transparent 25%),
+ radial-gradient(circle at 14% 64%,rgba(255,135,60,.18),transparent 28%),
+ radial-gradient(circle at 85% 55%,rgba(255,230,180,.16),transparent 26%),
+ linear-gradient(135deg,#080402,#1a1008 45%,#020101)}
+
+.swatch{width:38px;height:38px;border-radius:999px;background-size:cover;background-position:center;box-shadow:inset 0 0 0 999px rgba(0,0,0,.18)}
+.swatch.active{outline:2px solid #fff;box-shadow:0 0 20px rgba(255,255,255,.45), inset 0 0 0 999px rgba(0,0,0,.06)}
+.tools{position:absolute;right:34px;bottom:80px;z-index:5;background:rgba(18,18,18,.62);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px;display:grid;gap:10px}
+.tool{width:104px;height:46px;border-radius:10px;font-size:11px;letter-spacing:1px;text-transform:uppercase}
+.hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:5;font-size:12px;letter-spacing:2px;opacity:.82;text-shadow:0 0 12px rgba(255,255,255,.5);white-space:nowrap}
+.loading{position:absolute;inset:0;display:grid;place-items:center;background:#000;z-index:50;text-align:center}
+.loader-brand{display:grid;place-items:center;animation:pulseLoader 1.8s ease-in-out infinite}
+.loader-brand img{width:min(300px,56vw);filter:drop-shadow(0 0 26px rgba(255,255,255,.55))}
+.loader-brand span{display:none}
+@keyframes pulseLoader{0%,100%{opacity:.72;transform:scale(.985)}50%{opacity:1;transform:scale(1)}}
+.error{color:#ffb3b3;text-align:center;line-height:1.5;max-width:720px;padding:30px}
+@media(max-width:800px){
+ .panel{left:12px;top:auto;bottom:86px;width:calc(100% - 24px);display:block;padding:16px}
+ .tools{right:12px;bottom:12px;grid-auto-flow:column}
+ .hint{display:none}
+ .brand{left:18px;top:18px}
+ .logo-bg{width:130vw;top:8%}
+}
+
+body{
+letter-spacing:.08em;
+}
+
+#app{
+background:
+radial-gradient(circle at 50% 15%, rgba(255,255,255,.10), transparent 18%),
+radial-gradient(circle at 50% 40%, rgba(255,255,255,.05), transparent 30%),
+linear-gradient(180deg,#020202 0%,#090909 45%,#000000 100%);
+}
+
+.logo-bg{
+opacity:.38 !important;
+width:min(90vw,1450px) !important;
+top:-2% !important;
+mix-blend-mode:screen;
+}
+
+.panel{
+background:rgba(8,8,8,.74) !important;
+border:1px solid rgba(255,255,255,.12) !important;
+backdrop-filter:blur(28px) saturate(140%) !important;
+box-shadow:
+0 0 0 1px rgba(255,255,255,.04),
+0 25px 90px rgba(0,0,0,.7),
+0 0 40px rgba(255,255,255,.04) !important;
+}
+
+.tools{
+background:rgba(8,8,8,.74) !important;
+border:1px solid rgba(255,255,255,.12) !important;
+backdrop-filter:blur(28px) saturate(140%) !important;
+box-shadow:
+0 25px 90px rgba(0,0,0,.7),
+0 0 40px rgba(255,255,255,.04) !important;
+}
+
+h3{
+font-size:10px !important;
+font-weight:700 !important;
+letter-spacing:.24em !important;
+opacity:.9;
+}
+
+button,
+select{
+font-family:Inter,Helvetica,Arial,sans-serif !important;
+font-weight:600 !important;
+letter-spacing:.18em !important;
+text-transform:uppercase !important;
+transition:
+transform .25s ease,
+background .25s ease,
+border-color .25s ease,
+box-shadow .25s ease,
+opacity .25s ease !important;
+}
+
+button:hover,
+select:hover{
+transform:translateY(-1px);
+border-color:rgba(255,255,255,.32) !important;
+box-shadow:0 0 26px rgba(255,255,255,.10);
+}
+
+.tool{
+background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03)) !important;
+height:48px !important;
+}
+
+.swatch{
+border:1px solid rgba(255,255,255,.14) !important;
+overflow:hidden;
+position:relative;
+}
+
+.swatch::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(180deg,rgba(255,255,255,.16),transparent 60%);
+opacity:.7;
+}
+
+.swatch.active{
+outline:1px solid rgba(255,255,255,.9) !important;
+box-shadow:
+0 0 0 1px rgba(255,255,255,.22),
+0 0 28px rgba(255,255,255,.18),
+0 12px 32px rgba(0,0,0,.45) !important;
+transform:scale(1.05);
+}
+
+.arrow{
+background:rgba(10,10,10,.55) !important;
+border:1px solid rgba(255,255,255,.10);
+box-shadow:
+0 10px 40px rgba(0,0,0,.6),
+0 0 20px rgba(255,255,255,.06) !important;
+}
+
+.arrow:hover{
+transform:translateY(-50%) scale(1.08) !important;
+background:rgba(255,255,255,.08) !important;
+}
+
+.brand{
+width:220px !important;
+opacity:.95;
+}
+
+.loading{
+background:#000 !important;
+}
+
+.loader-brand img{
+width:min(360px,60vw) !important;
+filter:
+drop-shadow(0 0 18px rgba(255,255,255,.45))
+drop-shadow(0 0 60px rgba(255,255,255,.18)) !important;
+}
+
+.hint{
+font-size:10px !important;
+letter-spacing:.32em !important;
+text-transform:uppercase !important;
+opacity:.6 !important;
+}
+
+.section{
+border-bottom:1px solid rgba(255,255,255,.06) !important;
+padding-bottom:20px !important;
+margin-bottom:20px !important;
+}
+
+.color-picker{
+background:#0a0a0a !important;
+}
+
+.range{
+opacity:.9;
+}
+
+::-webkit-scrollbar{
+width:6px;
+}
+::-webkit-scrollbar-thumb{
+background:rgba(255,255,255,.14);
+border-radius:999px;
+}
+
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<style>
+:root{--accent:#FF7950!important;--memento-accent:#FF7950!important;}
+button:hover,a:hover,select:hover,label:hover,.active,.selected,[aria-selected="true"],.swatch:hover,.swatch.active{
+  color:#FF7950!important;
+  border-color:#FF7950!important;
+  box-shadow:0 0 26px rgba(255,121,80,.25)!important;
+}
+</style>
+
+
+
+
+
+<style id="memento-stable-final-ui">
+:root{
+  --memento-orange:#FF7950;
+  --memento-panel:rgba(7,7,7,.80);
+  --memento-panel-2:rgba(18,18,18,.70);
+  --memento-line:rgba(255,255,255,.12);
+  --memento-line-soft:rgba(255,255,255,.065);
+  --memento-text:rgba(255,255,255,.92);
+  --memento-muted:rgba(255,255,255,.48);
+}
+
+*{box-sizing:border-box!important}
+html,body{
+  width:100%!important;
+  height:100%!important;
+  margin:0!important;
+  background:#000!important;
+  overflow:hidden!important;
+}
+
+/* Canvas sempre full-screen: niente taglio modello */
+canvas{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100svh!important;
+  max-width:none!important;
+  max-height:none!important;
+  transform:none!important;
+  transform-origin:center!important;
+  z-index:1!important;
+}
+
+/* Rimuove brand/logo in alto a sinistra */
+.brand,
+.logo-top,
+.header-logo,
+.nav-logo,
+.site-logo,
+.top-logo,
+img[alt*="memento" i]:not(#memento-symbol-bg),
+img[src*="logo" i]:not(#memento-symbol-bg){
+  display:none!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+
+/* Nasconde vecchi watermark/scritte */
+.logo-bg,
+.background-logo,
+.watermark,
+.wordmark,
+#memento-wordmark-bg{
+  display:none!important;
+}
+
+/* Simbolo MEMENTO nel background, centrato e non invadente */
+#memento-symbol-bg{
+  position:fixed!important;
+  left:50%!important;
+  top:39%!important;
+  width:clamp(190px,22vw,360px)!important;
+  height:auto!important;
+  transform:translate(-50%,-50%)!important;
+  z-index:0!important;
+  opacity:.105!important;
+  pointer-events:none!important;
+  filter:drop-shadow(0 0 46px rgba(255,255,255,.08))!important;
+  object-fit:contain!important;
+}
+
+/* Tutta la UI si vede solo dopo il caricamento */
+body:not(.memento-ui-ready) .panel,
+body:not(.memento-ui-ready) .sidebar,
+body:not(.memento-ui-ready) .controls,
+body:not(.memento-ui-ready) .control-panel,
+body:not(.memento-ui-ready) .toolbar,
+body:not(.memento-ui-ready) .tools{
+  opacity:0!important;
+  pointer-events:none!important;
+}
+
+/* Pannello centrale unico */
+.panel,
+.sidebar,
+.controls,
+.control-panel{
+  position:fixed!important;
+  left:50%!important;
+  right:auto!important;
+  top:auto!important;
+  bottom:24px!important;
+  transform:translateX(-50%)!important;
+  width:min(1120px,calc(100vw - 48px))!important;
+  max-width:calc(100vw - 48px)!important;
+  max-height:32svh!important;
+  min-height:154px!important;
+  overflow:hidden!important;
+  z-index:60!important;
+
+  display:grid!important;
+  grid-template-rows:auto 1fr!important;
+  align-items:stretch!important;
+  justify-content:stretch!important;
+
+  padding:14px 22px 20px!important;
+  background:linear-gradient(180deg,var(--memento-panel-2),var(--memento-panel))!important;
+  border:1px solid var(--memento-line)!important;
+  border-radius:22px!important;
+  box-shadow:
+    0 32px 96px rgba(0,0,0,.76),
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 0 48px rgba(255,121,80,.055)!important;
+  backdrop-filter:blur(30px) saturate(160%)!important;
+}
+
+/* Toolbar integrata nel pannello, non più separata */
+.toolbar,
+.tools,
+#memento-integrated-toolbar{
+  position:static!important;
+  left:auto!important;
+  right:auto!important;
+  top:auto!important;
+  bottom:auto!important;
+  transform:none!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:48px!important;
+  max-height:52px!important;
+  z-index:auto!important;
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:8px!important;
+  margin:0 0 14px!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+
+/* Se l'app ha toolbar esterna, la forziamo dentro visivamente */
+body.memento-ui-ready .toolbar,
+body.memento-ui-ready .tools{
+  opacity:1!important;
+}
+
+/* Bottoni toolbar */
+.toolbar button,
+.tools button,
+.tool,
+#memento-integrated-toolbar button{
+  width:100%!important;
+  min-width:0!important;
+  height:46px!important;
+  min-height:46px!important;
+  margin:0!important;
+  padding:0 12px!important;
+  border-radius:14px!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012))!important;
+  color:var(--memento-text)!important;
+  font-size:10px!important;
+  line-height:1!important;
+  font-weight:760!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+.toolbar button:hover,
+.tools button:hover,
+.tool:hover,
+#memento-integrated-toolbar button:hover{
+  border-color:rgba(255,121,80,.62)!important;
+  color:#fff!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 0 24px rgba(255,121,80,.18)!important;
+}
+
+/* Contenuto pannello sotto toolbar */
+#memento-controls-wrap{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:minmax(128px,.8fr) minmax(230px,1.35fr) minmax(190px,1fr) minmax(210px,1.05fr)!important;
+  gap:0!important;
+  overflow:hidden!important;
+}
+
+/* Sezioni del pannello */
+.panel .section,
+.sidebar .section,
+.controls .section,
+.control-panel .section,
+#memento-controls-wrap > *{
+  min-width:0!important;
+  max-width:none!important;
+  width:auto!important;
+  padding:0 22px!important;
+  margin:0!important;
+  border-right:1px solid var(--memento-line-soft)!important;
+  overflow:hidden!important;
+}
+
+#memento-controls-wrap > *:first-child,
+.panel .section:first-child,
+.sidebar .section:first-child,
+.controls .section:first-child,
+.control-panel .section:first-child{
+  padding-left:0!important;
+}
+
+#memento-controls-wrap > *:last-child,
+.panel .section:last-child,
+.sidebar .section:last-child,
+.controls .section:last-child,
+.control-panel .section:last-child{
+  border-right:0!important;
+  padding-right:0!important;
+}
+
+/* Tipografia */
+h1,h2,h3,label,.label,.section-title{
+  color:var(--memento-muted)!important;
+  font-size:10px!important;
+  line-height:1.1!important;
+  font-weight:700!important;
+  letter-spacing:.22em!important;
+  text-transform:uppercase!important;
+  margin:0 0 12px 0!important;
+}
+
+/* Select e bottoni */
+select,
+.panel button:not(.tool),
+.sidebar button:not(.tool),
+.controls button:not(.tool),
+.control-panel button:not(.tool){
+  width:100%!important;
+  min-height:42px!important;
+  border-radius:13px!important;
+  background:rgba(255,255,255,.025)!important;
+  border:1px solid rgba(255,255,255,.11)!important;
+  color:#fff!important;
+  font-size:10px!important;
+  font-weight:760!important;
+  letter-spacing:.12em!important;
+  text-transform:uppercase!important;
+  padding:0 14px!important;
+  transition:.22s ease!important;
+  white-space:nowrap!important;
+}
+
+/* Hover / active */
+select:hover,
+button:hover,
+.active,
+.selected,
+[aria-selected="true"]{
+  border-color:var(--memento-orange)!important;
+  color:#fff!important;
+  box-shadow:0 0 22px rgba(255,121,80,.18)!important;
+}
+
+/* Swatches */
+.swatch,
+.color-btn,
+.texture-btn,
+.light-swatch{
+  width:32px!important;
+  height:32px!important;
+  min-width:32px!important;
+  border-radius:50%!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14)!important;
+  margin:2px!important;
+}
+
+.swatch:hover,
+.color-btn:hover,
+.texture-btn:hover,
+.light-swatch:hover,
+.swatch.active,
+.color-btn.active,
+.texture-btn.active{
+  border-color:var(--memento-orange)!important;
+  box-shadow:
+    0 0 0 2px rgba(255,121,80,.12),
+    0 0 20px rgba(255,121,80,.25)!important;
+}
+
+/* Slider */
+input[type="range"]{
+  width:100%!important;
+  accent-color:var(--memento-orange)!important;
+}
+
+/* Frecce modello discrete */
+.arrow{
+  position:fixed!important;
+  top:50%!important;
+  bottom:auto!important;
+  transform:translateY(-50%)!important;
+  width:42px!important;
+  height:42px!important;
+  z-index:45!important;
+  border-radius:50%!important;
+  background:rgba(8,8,8,.58)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  backdrop-filter:blur(18px)!important;
+}
+
+.arrow.left{left:22px!important}
+.arrow.right{right:22px!important}
+
+/* Hint non necessario */
+.hint{display:none!important}
+
+/* Black pure */
+body.memento-black-pure{
+  background:#000!important;
+}
+
+/* TABLET */
+@media(max-width:980px){
+  #memento-symbol-bg{
+    top:37%!important;
+    width:clamp(170px,30vw,300px)!important;
+  }
+
+  .panel,.sidebar,.controls,.control-panel{
+    width:calc(100vw - 28px)!important;
+    max-width:calc(100vw - 28px)!important;
+    bottom:16px!important;
+    max-height:36svh!important;
+    min-height:158px!important;
+    padding:12px 16px 18px!important;
+  }
+
+  #memento-controls-wrap{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  }
+
+  .panel .section,
+  .sidebar .section,
+  .controls .section,
+  .control-panel .section,
+  #memento-controls-wrap > *{
+    padding:0 14px!important;
+  }
+
+  .toolbar button,
+  .tools button,
+  .tool,
+  #memento-integrated-toolbar button{
+    font-size:9px!important;
+    letter-spacing:.10em!important;
+    height:42px!important;
+    min-height:42px!important;
+  }
+}
+
+/* MOBILE: il menu NON si allarga e non si rompe */
+@media(max-width:720px){
+  #memento-symbol-bg{
+    top:34%!important;
+    width:clamp(145px,48vw,230px)!important;
+    opacity:.09!important;
+  }
+
+  .panel,.sidebar,.controls,.control-panel{
+    left:50%!important;
+    bottom:10px!important;
+    width:calc(100vw - 16px)!important;
+    max-width:calc(100vw - 16px)!important;
+    min-height:224px!important;
+    max-height:42svh!important;
+    padding:10px!important;
+    border-radius:18px!important;
+    overflow:hidden!important;
+    display:grid!important;
+    grid-template-rows:auto 1fr!important;
+  }
+
+  .toolbar,
+  .tools,
+  #memento-integrated-toolbar{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:6px!important;
+    min-height:40px!important;
+    max-height:42px!important;
+    margin-bottom:10px!important;
+  }
+
+  .toolbar button,
+  .tools button,
+  .tool,
+  #memento-integrated-toolbar button{
+    height:38px!important;
+    min-height:38px!important;
+    padding:0 5px!important;
+    font-size:7.5px!important;
+    letter-spacing:.055em!important;
+    border-radius:11px!important;
+  }
+
+  #memento-controls-wrap{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    grid-template-rows:auto auto!important;
+    gap:12px 0!important;
+    width:100%!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+
+  .panel .section,
+  .sidebar .section,
+  .controls .section,
+  .control-panel .section,
+  #memento-controls-wrap > *{
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    padding:0 10px!important;
+    border-right:1px solid var(--memento-line-soft)!important;
+    overflow:hidden!important;
+  }
+
+  #memento-controls-wrap > *:nth-child(2n),
+  .panel .section:nth-child(2n),
+  .sidebar .section:nth-child(2n),
+  .controls .section:nth-child(2n),
+  .control-panel .section:nth-child(2n){
+    border-right:0!important;
+  }
+
+  h1,h2,h3,label,.label,.section-title{
+    font-size:7.5px!important;
+    letter-spacing:.16em!important;
+    margin-bottom:8px!important;
+  }
+
+  select,
+  .panel button:not(.tool),
+  .sidebar button:not(.tool),
+  .controls button:not(.tool),
+  .control-panel button:not(.tool){
+    min-height:34px!important;
+    font-size:7.5px!important;
+    letter-spacing:.06em!important;
+    padding:0 8px!important;
+    border-radius:10px!important;
+  }
+
+  .swatch,
+  .color-btn,
+  .texture-btn,
+  .light-swatch{
+    width:25px!important;
+    height:25px!important;
+    min-width:25px!important;
+  }
+
+  input[type="range"]{
+    max-width:100%!important;
+  }
+
+  .arrow{
+    display:none!important;
+  }
+}
+
+/* SMALL MOBILE */
+@media(max-width:420px){
+  .panel,.sidebar,.controls,.control-panel{
+    min-height:232px!important;
+    max-height:45svh!important;
+  }
+
+  .toolbar button,
+  .tools button,
+  .tool,
+  #memento-integrated-toolbar button{
+    font-size:7px!important;
+    letter-spacing:.025em!important;
+    padding:0 3px!important;
+  }
+
+  .swatch,
+  .color-btn,
+  .texture-btn,
+  .light-swatch{
+    width:23px!important;
+    height:23px!important;
+    min-width:23px!important;
+  }
+}
+</style>
+
+</head>
+
+<body>
+<div id="app" class="bg-normal">
+  <img class="logo-bg" src="assets/logo/memento-logo.webp" alt="">
+  <div class="brand"><img src="assets/logo/memento-logo.webp" alt="Memento Configurator"></div>
+
+  <div class="panel">
+    <div class="section">
+      <h3>Model</h3>
+      <select id="modelSelect"></select>
+    </div>
+
+    <div class="section">
+      <h3>Glow RGB</h3>
+      <div class="rgb-wrap">
+        <input id="glowColor" class="color-picker" type="color" value="#ffffff">
+        <input id="glowRange" class="range" type="range" min="0" max="100" value="75">
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Background</h3>
+      <select id="backgroundSelect">
+        <option value="normal">MONO BLACK</option>
+        <option value="negative">NEGATIVE</option>
+        <option value="hdri1">STUDIO</option>
+        <option value="hdri2">NEON</option>
+        <option value="hdri3">LUXURY</option>
+      </select>
+    </div>
+
+    <div id="texturePanel"></div>
+  </div>
+
+  <button class="arrow left" id="prevModel">‹</button>
+  <button class="arrow right" id="nextModel">›</button>
+
+  <div class="tools">
+    <button class="tool" id="resetBtn">RESET</button>
+    <button class="tool" id="wireBtn">WIREFRAME</button>
+    <button class="tool" id="autoBtn">AUTO</button>
+    <button class="tool" id="shotBtn">SNAP</button>
+  </div>
+
+  <div class="hint">DRAG TO ROTATE &nbsp; • &nbsp; SCROLL TO ZOOM &nbsp; • &nbsp; RIGHT DRAG TO PAN</div>
+  <div class="loading" id="loading">
+    <div class="loader-brand">
+      <img src="assets/logo/memento-logo.webp" alt="MEMENTO"><div style="margin-top:18px;font-size:11px;letter-spacing:.45em;font-weight:600;color:rgba(255,255,255,.72)">CONFIGURATOR EXPERIENCE</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
+
+const app = document.getElementById("app");
+const loading = document.getElementById("loading");
+const texturePanel = document.getElementById("texturePanel");
+const modelSelect = document.getElementById("modelSelect");
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, 0.01, 5000);
+camera.position.set(0, 0.9, 4.2);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, preserveDrawingBuffer:true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.18;
+app.prepend(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.9;
+controls.target.set(0, 0.75, 0);
+controls.minDistance = 1.2;
+controls.maxDistance = 7;
+
+scene.add(new THREE.AmbientLight(0xffffff, 1.35));
+const key = new THREE.DirectionalLight(0xffffff, 2.8); key.position.set(3,4,4); scene.add(key);
+const rim1 = new THREE.DirectionalLight(0xffffff, 2.5); rim1.position.set(-4,2,-3); scene.add(rim1);
+const rim2 = new THREE.DirectionalLight(0xffffff, 2.2); rim2.position.set(4,2,-3); scene.add(rim2);
+const controllableLights = [key, rim1, rim2];
+
+let manifest = {};
+let modelKeys = [];
+let currentModelKey = null;
+let model = null;
+let wireframe = false;
+let materialTargets = {};
+let hasLoadedOnce = false;
+let isSwitchingModel = false;
+
+function setInterfaceVisible(visible){
+  const display = visible ? "" : "none";
+  document.querySelector(".logo-bg").style.display = display;
+  document.querySelector(".brand").style.display = display;
+  document.querySelector(".panel").style.display = display;
+  document.querySelector(".tools").style.display = display;
+  document.querySelector(".hint").style.display = display;
+  document.querySelectorAll(".arrow").forEach(a => {
+    a.style.display = display;
+    a.style.pointerEvents = visible ? "auto" : "none";
+  });
+}
+const texLoader = new THREE.TextureLoader();
+
+function normalizeName(v){
+  return String(v || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function materialMatches(materialName, aliases){
+  const n = normalizeName(materialName);
+  return aliases.some(alias=>{
+    const a = normalizeName(alias);
+    return n === a || n.includes(a);
+  });
+}
+
+function loadTexture(path){
+  const t = texLoader.load(path);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.flipY = true;
+  return t;
+}
+
+function convertMaterial(sourceMaterial){
+  const mat = new THREE.MeshStandardMaterial({
+    name: sourceMaterial?.name || "",
+    color: 0xffffff,
+    map: sourceMaterial?.map || null,
+    roughness: sourceMaterial?.roughness ?? .78,
+    metalness: sourceMaterial?.metalness ?? .03,
+    side: THREE.DoubleSide
+  });
+  mat.wireframe = wireframe;
+  return mat;
+}
+
+function prepareMeshMaterials(mesh){
+  if(Array.isArray(mesh.material)){
+    mesh.material = mesh.material.map(m=>convertMaterial(m));
+  } else {
+    mesh.material = convertMaterial(mesh.material);
+  }
+}
+
+function centerAndFit(obj){
+  obj.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(obj);
+  const center = box.getCenter(new THREE.Vector3());
+
+  obj.position.x -= center.x;
+  obj.position.y -= center.y;
+  obj.position.z -= center.z;
+  obj.updateMatrixWorld(true);
+
+  const box2 = new THREE.Box3().setFromObject(obj);
+  const size = box2.getSize(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z);
+
+  if(maxDim > 0){
+    obj.scale.multiplyScalar(2.55 / maxDim);
+  }
+
+  obj.updateMatrixWorld(true);
+
+  const box3 = new THREE.Box3().setFromObject(obj);
+  const c = box3.getCenter(new THREE.Vector3());
+  const s = box3.getSize(new THREE.Vector3());
+
+  controls.target.set(c.x, c.y + s.y * .08, c.z);
+  camera.position.set(c.x, c.y + s.y * .08, c.z + 3.9);
+  camera.lookAt(controls.target);
+  controls.update();
+}
+
+function findMaterialSlots(groupConfig){
+  const aliases = groupConfig.aliases || [];
+  const slots = [];
+
+  model.traverse(mesh=>{
+    if(!mesh.isMesh) return;
+
+    if(Array.isArray(mesh.material)){
+      mesh.material.forEach((mat, index)=>{
+        if(materialMatches(mat?.name, aliases)){
+          slots.push({ mesh, index });
+        }
+      });
+    } else {
+      if(materialMatches(mesh.material?.name, aliases)){
+        slots.push({ mesh, index:null });
+      }
+    }
+  });
+
+  return slots;
+}
+
+function applyTexture(groupKey, path){
+  if(!model) return;
+
+  const map = loadTexture(path);
+  const slots = materialTargets[groupKey] || [];
+
+  if(slots.length === 0){
+    // fallback for polo/simple models: apply to all visible meshes only for single-color group
+    if(groupKey === "color"){
+      model.traverse(mesh=>{
+        if(!mesh.isMesh) return;
+        if(Array.isArray(mesh.material)){
+          mesh.material.forEach(mat=>{ mat.map = map; mat.needsUpdate = true; });
+        } else {
+          mesh.material.map = map;
+          mesh.material.needsUpdate = true;
+        }
+      });
+    }
+    return;
+  }
+
+  slots.forEach(slot=>{
+    const mat = slot.index === null ? slot.mesh.material : slot.mesh.material[slot.index];
+    mat.map = map;
+    mat.needsUpdate = true;
+    mat.wireframe = wireframe;
+  });
+}
+
+function buildTextureUI(modelConfig){
+  texturePanel.innerHTML = "";
+
+  Object.entries(modelConfig.groups).forEach(([groupKey, groupConfig])=>{
+    if(!groupConfig.textures || !groupConfig.textures.length) return;
+
+    const section = document.createElement("div");
+    section.className = "section";
+    section.innerHTML = `<h3>${groupConfig.label || groupKey}</h3><div class="row"></div>`;
+
+    const row = section.querySelector(".row");
+
+    groupConfig.textures.forEach((path, i)=>{
+      const b = document.createElement("button");
+      b.className = "swatch" + (i === 0 ? " active" : "");
+      b.style.backgroundImage = `url(${path})`;
+
+      b.onclick = ()=>{
+        row.querySelectorAll("button").forEach(x=>x.classList.remove("active"));
+        b.classList.add("active");
+        applyTexture(groupKey, path);
+      };
+
+      row.appendChild(b);
+    });
+
+    texturePanel.appendChild(section);
+  });
+}
+
+function disposeObject(obj){
+  if(!obj) return;
+
+  scene.remove(obj);
+
+  obj.traverse(o=>{
+    if(o.geometry) o.geometry.dispose?.();
+
+    if(o.material){
+      if(Array.isArray(o.material)) o.material.forEach(m=>m.dispose?.());
+      else o.material.dispose?.();
+    }
+  });
+}
+
+function setModelOpacity(obj, opacity){
+  if(!obj) return;
+
+  obj.traverse(o=>{
+    if(!o.isMesh || !o.material) return;
+
+    const setMat = mat=>{
+      mat.transparent = true;
+      mat.opacity = opacity;
+      mat.needsUpdate = true;
+    };
+
+    if(Array.isArray(o.material)) o.material.forEach(setMat);
+    else setMat(o.material);
+  });
+}
+
+function animateModelSwitch(oldModel, newModel, direction = 1){
+  return new Promise(resolve=>{
+    const duration = 950;
+    const startTime = performance.now();
+
+    const oldStartX = oldModel ? oldModel.position.x : 0;
+    const newFinalX = newModel.position.x;
+    const offset = direction * 1.65;
+
+    if(newModel){
+      newModel.position.x = newFinalX + offset;
+      setModelOpacity(newModel, 0);
+    }
+
+    function frame(){
+      const t = Math.min(1, (performance.now() - startTime) / duration);
+      const ease = t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+      if(oldModel){
+        oldModel.position.x = oldStartX - offset * ease;
+        setModelOpacity(oldModel, 1 - ease);
+      }
+
+      if(newModel){
+        newModel.position.x = newFinalX + offset * (1 - ease);
+        setModelOpacity(newModel, ease);
+      }
+
+      if(t < 1){
+        requestAnimationFrame(frame);
+      } else {
+        if(oldModel) disposeObject(oldModel);
+        if(newModel){
+          newModel.position.x = newFinalX;
+          setModelOpacity(newModel, 1);
+        }
+        resolve();
+      }
+    }
+
+    frame();
+  });
+}
+
+function preloadFBX(path){
+  return new Promise((resolve, reject)=>{
+    new FBXLoader().load(path, resolve, undefined, reject);
+  });
+}
+
+async function loadModel(modelKey, direction = 1){
+  if(isSwitchingModel) return;
+  isSwitchingModel = true;
+
+  currentModelKey = modelKey;
+  const modelConfig = manifest[modelKey];
+
+  if(!hasLoadedOnce){
+    loading.style.display = "grid";
+  }
+
+  try{
+    const obj = await preloadFBX(modelConfig.model);
+    const oldModel = model;
+    model = obj;
+
+    model.traverse(o=>{
+      if(!o.isMesh) return;
+      o.castShadow = true;
+      o.receiveShadow = true;
+      prepareMeshMaterials(o);
+    });
+
+    scene.add(model);
+    centerAndFit(model);
+
+    materialTargets = {};
+    Object.entries(modelConfig.groups).forEach(([groupKey, groupConfig])=>{
+      materialTargets[groupKey] = findMaterialSlots(groupConfig);
+    });
+
+    buildTextureUI(modelConfig);
+
+    Object.entries(modelConfig.groups).forEach(([groupKey, groupConfig])=>{
+      if(groupConfig.textures && groupConfig.textures[0]){
+        applyTexture(groupKey, groupConfig.textures[0]);
+      }
+    });
+
+    // On first load: fade in logo/loading out. On next loads: crossfade/slide model-to-model.
+    if(!hasLoadedOnce){
+      setModelOpacity(model, 0);
+      await animateModelSwitch(null, model, direction);
+      loading.style.opacity = "0";
+      loading.style.transition = "opacity .45s ease";
+      setTimeout(()=>{
+        loading.style.display = "none";
+        loading.style.opacity = "1";
+        setInterfaceVisible(true);
+      }, 460);
+      hasLoadedOnce = true;
+    } else {
+      await animateModelSwitch(oldModel, model, direction);
+    }
+  } catch(err){
+    console.error(err);
+    loading.style.display = "grid";
+    loading.innerHTML = `<div class="error">Errore caricamento modello.<br>${modelConfig.model}</div>`;
+  } finally {
+    isSwitchingModel = false;
+  }
+}
+
+function switchModel(delta){
+  if(!modelKeys || modelKeys.length < 2) {
+    console.warn("Non ci sono abbastanza modelli per cambiare.");
+    return;
+  }
+
+  if(isSwitchingModel) {
+    console.warn("Cambio modello già in corso.");
+    return;
+  }
+
+  let currentIndex = modelKeys.indexOf(currentModelKey);
+
+  if(currentIndex < 0){
+    currentIndex = modelSelect.selectedIndex >= 0 ? modelSelect.selectedIndex : 0;
+  }
+
+  const nextIndex = (currentIndex + delta + modelKeys.length) % modelKeys.length;
+  const nextKey = modelKeys[nextIndex];
+
+  currentModelKey = nextKey;
+  modelSelect.value = nextKey;
+
+  loadModel(nextKey, delta >= 0 ? 1 : -1);
+}
+
+async function start(){
+  setInterfaceVisible(false);
+  manifest = await fetch("configurator.json").then(r=>r.json());
+  modelKeys = Object.keys(manifest);
+
+  Object.entries(manifest).forEach(([key, cfg])=>{
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = (cfg.label || key).replace("Pants","Pantaloni").replace("Polo","Polo");
+    modelSelect.appendChild(opt);
+  });
+
+  modelSelect.onchange = ()=>{
+    const currentIndex = Math.max(0, modelKeys.indexOf(currentModelKey));
+    const nextIndex = Math.max(0, modelKeys.indexOf(modelSelect.value));
+    loadModel(modelSelect.value, nextIndex >= currentIndex ? 1 : -1);
+  };
+
+  const prevButton = document.getElementById("prevModel");
+  const nextButton = document.getElementById("nextModel");
+
+  prevButton.addEventListener("click", (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    switchModel(-1);
+  });
+
+  nextButton.addEventListener("click", (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    switchModel(1);
+  });
+
+  const glowColor = document.getElementById("glowColor");
+  const glowRange = document.getElementById("glowRange");
+  const backgroundSelect = document.getElementById("backgroundSelect");
+
+  function applyGlowColor(){
+    const color = glowColor.value;
+    const intensity = Number(glowRange.value) / 100;
+
+    const threeColor = new THREE.Color(color);
+    controllableLights.forEach((l, i)=>{
+      l.color.set(threeColor);
+      l.intensity = [2.8, 2.5, 2.2][i] * (0.45 + intensity);
+    });
+
+    const logo = document.querySelector(".logo-bg");
+    const a = Math.max(.25, intensity);
+    logo.style.filter = `drop-shadow(0 0 ${28 + intensity * 34}px ${color}) drop-shadow(0 0 ${80 + intensity * 120}px ${color})`;
+    logo.style.opacity = String(0.42 + intensity * 0.5);
+  }
+
+  glowColor.oninput = applyGlowColor;
+  glowRange.oninput = applyGlowColor;
+  applyGlowColor();
+
+  backgroundSelect.onchange = ()=>{
+    app.classList.remove("bg-normal","bg-negative","bg-hdri1","bg-hdri2","bg-hdri3");
+    app.classList.add("bg-" + backgroundSelect.value);
+  };
+
+  const first = modelKeys[0];
+  currentModelKey = first;
+  modelSelect.value = first;
+  loadModel(first, 1);
+}
+
+document.getElementById("resetBtn").onclick = ()=> model && centerAndFit(model);
+
+document.getElementById("wireBtn").onclick = ()=>{
+  wireframe = !wireframe;
+  if(model){
+    model.traverse(o=>{
+      if(!o.isMesh || !o.material) return;
+      if(Array.isArray(o.material)) o.material.forEach(mat=>mat.wireframe = wireframe);
+      else o.material.wireframe = wireframe;
+    });
+  }
+};
+
+document.getElementById("autoBtn").onclick = ()=>{
+  controls.autoRotate = !controls.autoRotate;
+  document.getElementById("autoBtn").textContent = controls.autoRotate ? "AUTO" : "Auto Off";
+};
+
+document.getElementById("shotBtn").onclick = ()=>{
+  const a = document.createElement("a");
+  a.href = renderer.domElement.toDataURL("image/png");
+  a.download = `memento-${currentModelKey || "configurator"}.png`;
+  a.click();
+};
+
+addEventListener("resize", ()=>{
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene,camera);
+}
+animate();
+start();
+</script>
+
+
+
+
+<script id="memento-stable-final-ui-js">
+(function(){
+  function findMainPanel(){
+    return document.querySelector('.panel,.sidebar,.controls,.control-panel');
+  }
+
+  function findToolbar(){
+    return document.querySelector('.toolbar,.tools');
+  }
+
+  function ensureSymbol(){
+    if(document.getElementById('memento-symbol-bg')) return;
+    var img=document.createElement('img');
+    img.id='memento-symbol-bg';
+    img.src='assets/logo/memento-logo.webp';
+    img.alt='Memento symbol';
+    document.body.prepend(img);
+  }
+
+  function renameButtons(){
+    document.querySelectorAll('button,.tool').forEach(function(el){
+      var txt=(el.textContent||'').trim().toLowerCase();
+      if(txt==='export'||txt==='export png'||txt==='screenshot'){
+        el.textContent='SNAP';
+      }
+    });
+  }
+
+  function integrateToolbar(){
+    var panel=findMainPanel();
+    if(!panel) return;
+
+    var toolbar=findToolbar();
+
+    if(!toolbar){
+      toolbar=document.createElement('div');
+      toolbar.id='memento-integrated-toolbar';
+      ['RESET','WIREFRAME','AUTO OFF','SNAP'].forEach(function(t){
+        var b=document.createElement('button');
+        b.textContent=t;
+        toolbar.appendChild(b);
+      });
+    }
+
+    if(!toolbar.classList.contains('memento-integrated')){
+      toolbar.classList.add('memento-integrated');
+      panel.prepend(toolbar);
+    }
+
+    if(!document.getElementById('memento-controls-wrap')){
+      var wrap=document.createElement('div');
+      wrap.id='memento-controls-wrap';
+
+      Array.from(panel.children).forEach(function(child){
+        if(child===toolbar) return;
+        wrap.appendChild(child);
+      });
+
+      panel.appendChild(wrap);
+    }
+  }
+
+  function addBlackPure(){
+    document.querySelectorAll('select').forEach(function(sel){
+      var area=(sel.closest('.section')||sel.parentElement||document.body).textContent.toLowerCase();
+      if(!area.includes('background')) return;
+
+      var exists=Array.from(sel.options).some(function(o){
+        return (o.textContent||'').toLowerCase().includes('black pure');
+      });
+
+      if(!exists){
+        var opt=document.createElement('option');
+        opt.value='black_pure';
+        opt.textContent='BLACK PURE';
+        sel.prepend(opt);
+      }
+
+      sel.addEventListener('change',function(){
+        var txt=(sel.options[sel.selectedIndex]?.textContent||'').toLowerCase();
+        var val=(sel.value||'').toLowerCase();
+        document.body.classList.toggle('memento-black-pure', txt.includes('black pure')||val.includes('black_pure'));
+      });
+    });
+  }
+
+  function ready(){
+    ensureSymbol();
+    renameButtons();
+    integrateToolbar();
+    addBlackPure();
+  }
+
+  document.addEventListener('DOMContentLoaded',ready);
+  window.addEventListener('load',function(){
+    ready();
+    setTimeout(function(){
+      document.body.classList.add('memento-ui-ready');
+      ready();
+    },900);
+  });
+
+  setTimeout(ready,400);
+  setTimeout(function(){
+    document.body.classList.add('memento-ui-ready');
+    ready();
+  },1800);
+})();
+</script>
+
+</body>
+</html>
